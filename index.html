@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EO DA BH CONTEÚDOS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .player-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .player-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .player-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        select, button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select {
+            background: #f0f0f0;
+            color: #333;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        select:hover {
+            background: #e0e0e0;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .player-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        video, audio {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .video-info {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .video-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .video-info p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .video-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .video-card-thumb {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3em;
+        }
+
+        .video-card-info {
+            padding: 15px;
+        }
+
+        .video-card-info h4 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+            word-break: break-word;
+        }
+
+        .video-card-info p {
+            color: #999;
+            font-size: 0.85em;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: white;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .empty-message h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .empty-message p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            padding: 20px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .player-controls {
+                flex-direction: column;
+            }
+
+            select {
+                min-width: 100%;
+            }
+
+            .videos-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 EO DA BH CONTEÚDOS</h1>
+            <p>Seus vídeos e áudios em um só lugar</p>
+        </header>
+
+        <div class="player-section">
+            <h2>Reprodutor</h2>
+            
+            <div class="player-controls">
+                <select id="videoSelect" onchange="loadVideo()">
+                    <option value="">Selecione um vídeo ou áudio...</option>
+                </select>
+                <button onclick="playVideo()">▶ Reproduzir</button>
+                <button onclick="pauseVideo()">⏸ Pausar</button>
+            </div>
+
+            <div class="player-container">
+                <video id="player" controls style="display: none;"></video>
+                <audio id="audioPlayer" controls style="display: none;"></audio>
+            </div>
+
+            <div class="video-info">
+                <h3 id="infoTitle">Nenhum vídeo selecionado</h3>
+                <p id="infoFile">Selecione um arquivo para começar</p>
+            </div>
+        </div>
+
+        <h2 style="color: white; margin-bottom: 20px;">📺 Biblioteca de Conteúdos</h2>
+        <div class="videos-grid" id="videosGrid"></div>
+
+        <div id="emptyMessage" class="empty-message" style="display: none;">
+            <h3>📁 Nenhum vídeo encontrado</h3>
+            <p>Adicione arquivos MP4 ou MP3 à pasta <strong>videos/</strong></p>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 EO DA BH CONTEÚDOS - Todos os direitos reservados</p>
+        </footer>
+    </div>
+
+    <script>
+        let videos = [];
+        let currentPlayer = null;
+
+        // Carregar lista de vídeos
+        async function loadVideos() {
+            try {
+                const response = await fetch('videos/');
+                const html = await response.text();
+                
+                // Parse HTML para extrair nomes de arquivos
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const links = doc.querySelectorAll('a');
+                
+                videos = [];
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (href && (href.endsWith('.mp4') || href.endsWith('.mp3') || 
+                                 href.endsWith('.webm') || href.endsWith('.ogg') ||
+                                 href.endsWith('.mov') || href.endsWith('.avi'))) {
+                        videos.push(href);
+                    }
+                });
+
+                // Se não encontrou vídeos com parsing, tenta com fetch direto
+                if (videos.length === 0) {
+                    console.log('Tentando carregar vídeos manualmente...');
+                    // Você pode adicionar uma lista manual aqui se necessário
+                }
+
+                updateUI();
+            } catch (error) {
+                console.log('Erro ao carregar pasta. Usando método alternativo...');
+                updateUI();
+            }
+        }
+
+        // Atualizar interface
+        function updateUI() {
+            const select = document.getElementById('videoSelect');
+            const grid = document.getElementById('videosGrid');
+            const emptyMsg = document.getElementById('emptyMessage');
+
+            // Limpar select
+            select.innerHTML = '<option value="">Selecione um vídeo ou áudio...</option>';
+
+            if (videos.length === 0) {
+                emptyMsg.style.display = 'block';
+                grid.innerHTML = '';
+                return;
+            }
+
+            emptyMsg.style.display = 'none';
+
+            // Adicionar vídeos ao select
+            videos.forEach((video, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = video.split('/').pop();
+                select.appendChild(option);
+            });
+
+            // Criar cards
+            grid.innerHTML = '';
+            videos.forEach((video, index) => {
+                const fileName = video.split('/').pop();
+                const isAudio = fileName.endsWith('.mp3') || fileName.endsWith('.ogg');
+                const icon = isAudio ? '🎵' : '🎬';
+
+                const card = document.createElement('div');
+                card.className = 'video-card';
+                card.onclick = () => {
+                    select.value = index;
+                    loadVideo();
+                };
+
+                card.innerHTML = `
+                    <div class="video-card-thumb">${icon}</div>
+                    <div class="video-card-info">
+                        <h4>${fileName}</h4>
+                        <p>Clique para reproduzir</p>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Carregar vídeo selecionado
+        function loadVideo() {
+            const select = document.getElementById('videoSelect');
+            const index = select.value;
+
+            if (index === '') {
+                document.getElementById('infoTitle').textContent = 'Nenhum vídeo selecionado';
+                document.getElementById('infoFile').textContent = 'Selecione um arquivo para começar';
+                document.getElementById('player').style.display = 'none';
+                document.getElementById('audioPlayer').style.display = 'none';
+                return;
+            }
+
+            const videoPath = 'videos/' + videos[index];
+            const fileName = videos[index];
+            const isAudio = fileName.endsWith('.mp3') || fileName.endsWith('.ogg');
+
+            // Mostrar/esconder players
+            if (isAudio) {
+                document.getElementById('player').style.display = 'none';
+                document.getElementById('audioPlayer').style.display = 'block';
+                currentPlayer = document.getElementById('audioPlayer');
+            } else {
+                document.getElementById('audioPlayer').style.display = 'none';
+                document.getElementById('player').style.display = 'block';
+                currentPlayer = document.getElementById('player');
+            }
+
+            // Carregar arquivo
+            currentPlayer.src = videoPath;
+
+            // Atualizar informações
+            document.getElementById('infoTitle').textContent = fileName;
+            document.getElementById('infoFile').textContent = `Arquivo: ${videoPath}`;
+        }
+
+        // Controles
+        function playVideo() {
+            if (currentPlayer) {
+                currentPlayer.play();
+            }
+        }
+
+        function pauseVideo() {
+            if (currentPlayer) {
+                currentPlayer.pause();
+            }
+        }
+
+        // Carregar vídeos ao iniciar
+        window.addEventListener('load', loadVideos);
+
+        // Recarregar a cada 5 segundos para detectar novos vídeos
+        setInterval(loadVideos, 5000);
+    </script>
+</body>
+</html>
